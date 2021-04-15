@@ -8,6 +8,8 @@ import { TextDocument, ASTNode, PropertyASTNode, Range, Thenable } from '../json
 import { JSONDocument } from '../parser/jsonParser';
 
 export function findLinks(document: TextDocument, doc: JSONDocument): Thenable<DocumentLink[]> {
+	// TODO: collect local "$id" values, and parse the $ref using those values.
+	// if we've seen the $id in other documents, link to those too.
 	const links: DocumentLink[] = [];
 	doc.visit(node => {
 		if (node.type === "property" && node.keyNode.value === "$ref" && node.valueNode?.type === 'string') {
@@ -31,6 +33,7 @@ function createRange(document: TextDocument, node: ASTNode): Range {
 }
 
 function findTargetNode(doc: JSONDocument, path: string): ASTNode | null {
+	// TODO: support links to other documents, via DocumentLinkResolveRequest
 	const tokens = parseJSONPointer(path);
 	if (!tokens) {
 		return null;

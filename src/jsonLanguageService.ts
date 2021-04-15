@@ -53,6 +53,7 @@ export interface LanguageService {
 	getSelectionRanges(document: TextDocument, positions: Position[], doc: JSONDocument): SelectionRange[];
 	findDefinition(document: TextDocument, position: Position, doc: JSONDocument): Thenable<DefinitionLink[]>;
 	findLinks(document: TextDocument, doc: JSONDocument): Thenable<DocumentLink[]>;
+	resolveLink(document: TextDocument, doc: JSONDocument, request: DocumentLink): Thenable<DocumentLink>;
 }
 
 
@@ -76,6 +77,7 @@ export function getLanguageService(params: LanguageServiceParams): LanguageServi
 				});
 			}
 			jsonValidation.configure(settings);
+			// TODO: allow specifying schemas for links here?
 		},
 		resetSchema: (uri: string) => jsonSchemaService.onResourceChange(uri),
 		doValidation: jsonValidation.doValidation.bind(jsonValidation),
@@ -92,7 +94,11 @@ export function getLanguageService(params: LanguageServiceParams): LanguageServi
 		getFoldingRanges,
 		getSelectionRanges,
 		findDefinition: () => Promise.resolve([]),
+		// TODO: change to a class and bind to it.
 		findLinks,
+		resolveLink: () => {
+			throw new Error('TODO: locate the source location of the requested ref from a different document');
+		},
 		format: (d, r, o) => {
 			let range: JSONCRange | undefined = undefined;
 			if (r) {
